@@ -1,5 +1,7 @@
 *.js
+*.un~
 secret.html
 *.toml
 netlify/
 
+birthday-site.zip
