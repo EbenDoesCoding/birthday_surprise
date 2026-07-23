@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Special Day...</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎂</text></svg>">
+  <!-- Fonts: preconnect first, then load with display=swap to avoid FOIT -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=Caveat:wght@400;600;700&family=JetBrains+Mono:wght@300;400&display=swap">
+  <link rel="stylesheet" href="css/globals.css">
+  <link rel="stylesheet" href="css/login.css">
+  <style>
+    /* ── Countdown Screen ── */
+    #countdown-screen {
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px; text-align: center;
+      animation: fadeIn 1s ease both;
+    }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+
+    .countdown-inner { max-width: 560px; width: 100%; }
+
+    .countdown-eyebrow {
+      font-family: var(--font-mono); font-size: 11px;
+      color: var(--rose-pink); letter-spacing: 0.1em;
+      margin-bottom: 20px; opacity: 0.8;
+    }
+
+    .countdown-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 7vw, 3.8rem);
+      font-weight: 900; color: var(--text-dark);
+      line-height: 1.1; margin-bottom: 12px;
+    }
+    .countdown-title .highlight {
+      background: var(--gradient-primary);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .countdown-sub {
+      font-size: 15px; color: var(--text-soft);
+      font-weight: 300; line-height: 1.7;
+      margin-bottom: 44px;
+    }
+
+    /* Timer units */
+    .countdown-timer {
+      display: flex; align-items: center; justify-content: center;
+      gap: 12px; flex-wrap: wrap; margin-bottom: 48px;
+    }
+    .cd-unit {
+      display: flex; flex-direction: column; align-items: center;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,182,200,0.35);
+      border-radius: 20px; padding: 20px 22px;
+      min-width: 80px;
+      box-shadow: 0 4px 24px rgba(220,50,90,0.10);
+      transition: transform 0.3s ease;
+      position: relative; overflow: hidden;
+    }
+    .cd-unit::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.4), transparent);
+      pointer-events: none;
+    }
+    .cd-unit:hover { transform: translateY(-4px); }
+    .cd-num {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 5vw, 2.8rem);
+      font-weight: 900; line-height: 1;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      min-width: 50px; text-align: center;
+      transition: transform 0.15s cubic-bezier(.22,1,.36,1);
+    }
+    .cd-num.tick {
+      animation: numTick 0.2s cubic-bezier(.22,1,.36,1);
+    }
+    @keyframes numTick {
+      0%   { transform: translateY(-8px); opacity: 0.5; }
+      100% { transform: translateY(0);    opacity: 1; }
+    }
+    .cd-label {
+      font-family: var(--font-mono); font-size: 10px;
+      color: var(--text-soft); letter-spacing: 0.08em;
+      margin-top: 6px; text-transform: uppercase;
+    }
+    .cd-sep {
+      font-size: 24px; color: var(--rose-200);
+      font-weight: 300; margin-bottom: 20px;
+      animation: sepPulse 1s ease-in-out infinite;
+    }
+    @keyframes sepPulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+    /* Progress bar to birthday */
+    .cd-progress-wrap {
+      margin-bottom: 36px;
+    }
+    .cd-progress-label {
+      font-family: var(--font-mono); font-size: 11px;
+      color: var(--text-soft); letter-spacing: 0.06em;
+      margin-bottom: 10px; display: flex;
+      justify-content: space-between;
+    }
+    .cd-progress-bar {
+      height: 4px; background: var(--rose-100);
+      border-radius: 99px; overflow: hidden;
+    }
+    .cd-progress-fill {
+      height: 100%;
+      background: var(--gradient-primary);
+      border-radius: 99px;
+      transition: width 1s ease;
+      box-shadow: 0 0 8px rgba(244,114,134,0.5);
+    }
+
+    /* Hint text */
+    .cd-hint {
+      font-size: 13px; color: var(--text-soft);
+      font-weight: 300; line-height: 1.7;
+    }
+    .cd-hint a {
+      color: var(--rose-pink); text-decoration: underline;
+      text-underline-offset: 3px; cursor: pointer;
+    }
+    .cd-hint a:hover { color: var(--rose-red); }
+
+    /* Unlock flash when it's time */
+    @keyframes unlockFlash {
+      0%   { background: var(--blush); }
+      25%  { background: rgba(255,182,200,0.3); }
+      50%  { background: var(--blush); }
+      75%  { background: rgba(255,182,200,0.3); }
+      100% { background: var(--blush); }
+    }
+    body.unlocking { animation: unlockFlash 1s ease; }
+
+    /* Dark mode countdown */
+    body.dark .cd-unit {
+      background: rgba(35,12,22,0.85);
+      border-color: rgba(255,100,140,0.2);
+    }
+
+    /* Mobile */
+    @media (max-width: 480px) {
+      .cd-unit { padding: 14px 16px; min-width: 64px; }
+      .cd-sep  { display: none; }
+      .countdown-timer { gap: 8px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Cursor -->
+  <div id="cursor"><div id="cursor-heart">♥</div></div>
+  <div id="cursor-ring"></div>
+
+  <!-- Progress bar -->
+  <div id="progress-bar"></div>
+
+  <!-- Ambient background -->
+  <div class="bg-ambient"></div>
+
+  <!-- Falling petals -->
+  <div id="petals-container"></div>
+
+  <!-- Interactive particles -->
+  <canvas id="particle-canvas"></canvas>
+
+  <!-- Code background lines -->
+  <div class="code-bg" id="code-bg"></div>
+
+  <!-- Dark mode toggle -->
+  <button class="dark-toggle" id="dark-toggle" title="Toggle dark mode">🌙</button>
+
+  <!-- Page Transition -->
+  <div class="page-transition" id="page-transition">
+    <div class="pt-icon">🎂</div>
+    <div class="pt-text">// loading your experience...</div>
+    <div class="pt-bar"><div class="pt-bar-fill" id="pt-fill"></div></div>
+  </div>
+
+  <!-- COUNTDOWN SCREEN (shown before birthday) -->
+  <div id="countdown-screen" style="display:none">
+    <div class="countdown-inner">
+      <div class="countdown-eyebrow">// something.special.is.coming()</div>
+
+      <h1 class="countdown-title">
+        A birthday is<br>
+        <span class="highlight">almost here</span> 🎂
+      </h1>
+
+      <p class="countdown-sub">
+        This site unlocks on June 17th.<br>
+        Come back when it's time to celebrate. 💕
+      </p>
+
+      <!-- Live countdown timer -->
+      <div class="countdown-timer">
+        <div class="cd-unit">
+          <div class="cd-num" id="cd-days">00</div>
+          <div class="cd-label">Days</div>
+        </div>
+        <div class="cd-sep">·</div>
+        <div class="cd-unit">
+          <div class="cd-num" id="cd-hours">00</div>
+          <div class="cd-label">Hours</div>
+        </div>
+        <div class="cd-sep">·</div>
+        <div class="cd-unit">
+          <div class="cd-num" id="cd-mins">00</div>
+          <div class="cd-label">Mins</div>
+        </div>
+        <div class="cd-sep">·</div>
+        <div class="cd-unit">
+          <div class="cd-num" id="cd-secs">00</div>
+          <div class="cd-label">Secs</div>
+        </div>
+      </div>
+
+      <!-- Progress toward birthday -->
+      <div class="cd-progress-wrap">
+        <div class="cd-progress-label">
+          <span>// progress to party</span>
+          <span id="cd-pct">0%</span>
+        </div>
+        <div class="cd-progress-bar">
+          <div class="cd-progress-fill" id="cd-progress-fill" style="width:0%"></div>
+        </div>
+      </div>
+
+      <p class="cd-hint">
+        Are you Christa? <a onclick="peekLogin()">Tap here ✦</a>
+      </p> 
+    </div>
+  </div>
+
+  <!-- LOGIN SCREEN (shown on/after birthday -->
+  <main class="login-page" id="login-screen" style="display:none">
+    <div class="glass login-card">
+
+      <div id="step-1">
+        <span class="login-cake" id="login-cake">🎂</span>
+        <h1 class="login-title">You're Invited!</h1>
+        <p class="login-sub">A special celebration awaits…</p>
+
+        <div class="login-form">
+          <div>
+            <label for="name-input">What's your name?</label>
+            <input
+              type="text" id="name-input" class="input-field"
+              placeholder="Enter your name..."
+              autocomplete="off" spellcheck="false"
+            >
+            <div class="form-error" id="name-error"></div>
+          </div>
+          <button class="btn-primary" onclick="handleNameSubmit()">
+            <span>✦</span> Enter the Party <span>→</span>
+          </button>
+        </div>
+      </div>
+
+      <div id="step-2" class="secret-step">
+        <button class="btn-back" onclick="goBack()">← Back</button>
+        <span style="font-size:36px;display:block;margin-bottom:12px">🔐</span>
+        <h2 style="font-family:var(--font-display);font-size:1.6rem;font-weight:700;margin-bottom:8px;color:var(--text-dark)">
+          Wait just a sec…
+        </h2>
+        <p style="font-size:14px;color:var(--text-soft);margin-bottom:24px;font-weight:300">
+          Let's make sure it's really you 🌸
+        </p>
+        <div class="login-form">
+          <div>
+            <div class="secret-label" id="secret-question-label"></div>
+            <label for="secret-input" style="margin-top:12px;">Your answer:</label>
+            <input
+              type="text" id="secret-input" class="input-field"
+              placeholder="Type your answer..."
+              autocomplete="off" spellcheck="false"
+            >
+            <div class="form-error" id="secret-error"></div>
+          </div>
+          <button class="btn-primary" onclick="handleSecretSubmit()">
+            <span>💕</span> That's me!
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <div class="login-footer">// built with love &amp; a lot of coffee ☕</div>
+
+  <script src="js/storage.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+
+  //  BIRTHDAY DATE & LOCK LOGIC
+ 
+  const BIRTHDAY = new Date('2026-06-17T00:00:00'); // June 17 2026 midnight
+  const SITE_START = new Date('2026-01-01T00:00:00'); // when countdown started (for progress bar)
+
+  function isBirthdayOrAfter() {
+    return new Date() >= BIRTHDAY;
+  }
+
+  function showCountdown() {
+    document.getElementById('countdown-screen').style.display = 'flex';
+    document.getElementById('login-screen').style.display = 'none';
+    document.title = 'Something special is coming… 🎂';
+    startCountdown();
+  }
+
+  function showLogin() {
+    document.getElementById('countdown-screen').style.display = 'none';
+    document.getElementById('login-screen').style.display = 'flex';
+    document.title = "You're Invited!!";
+    // Wire input teleport
+    document.getElementById('name-input')?.addEventListener('input', teleportParticles);
+    document.getElementById('secret-input')?.addEventListener('input', teleportParticles);
+  }
+
+  // Secret peek — Christa can access login even before her birthday
+  function peekLogin() {
+    showLogin();
+  }
+
+  // ── Countdown ticker ──
+  let prevSecs = -1;
+  function startCountdown() {
+    function tick() {
+      const now  = new Date();
+      const diff = BIRTHDAY - now;
+
+      if (diff <= 0) {
+        // It's birthday time — unlock!
+        document.body.classList.add('unlocking');
+        setTimeout(() => showLogin(), 1000);
+        return;
+      }
+
+      const days  = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const mins  = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const secs  = Math.floor((diff % (1000 * 60)) / 1000);
+
+      setUnit('cd-days',  String(days).padStart(2,'0'));
+      setUnit('cd-hours', String(hours).padStart(2,'0'));
+      setUnit('cd-mins',  String(mins).padStart(2,'0'));
+      setUnit('cd-secs',  String(secs).padStart(2,'0'), secs !== prevSecs);
+      prevSecs = secs;
+
+      // Progress bar — % of time elapsed from SITE_START to BIRTHDAY
+      const total   = BIRTHDAY - SITE_START;
+      const elapsed = now - SITE_START;
+      const pct     = Math.min(Math.max((elapsed / total) * 100, 0), 100).toFixed(1);
+      const fill    = document.getElementById('cd-progress-fill');
+      const pctEl   = document.getElementById('cd-pct');
+      if (fill)  fill.style.width  = pct + '%';
+      if (pctEl) pctEl.textContent = pct + '%';
+
+      setTimeout(tick, 1000);
+    }
+    tick();
+  }
+
+  function setUnit(id, val, animate = false) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (el.textContent !== val) {
+      el.textContent = val;
+      if (animate) {
+        el.classList.remove('tick');
+        void el.offsetWidth; // reflow
+        el.classList.add('tick');
+      }
+    }
+  }
+
+  if (isBirthdayOrAfter()) {
+    showLogin();
+  } else {
+    showCountdown();
+  }
+
+  //  CUSTOM CURSOR
+  const cursorEl   = document.getElementById('cursor');
+  const cursorRing = document.getElementById('cursor-ring');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  if (window.matchMedia('(min-width:769px)').matches) {
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX; my = e.clientY;
+      cursorEl.style.left = mx + 'px';
+      cursorEl.style.top  = my + 'px';
+    });
+      let ringRafId = null;
+    function ringLoop() {
+      rx += (mx - rx) * 0.10;
+      ry += (my - ry) * 0.10;
+      cursorRing.style.left = rx + 'px';
+      cursorRing.style.top  = ry + 'px';
+    }
+       ringRafId = requestAnimationFrame(ringLoop);
+    }
+    // Pause when tab is hidden
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) { cancelAnimationFrame(ringRafId); ringRafId = null; }
+      else if (!ringRafId) ringLoop();
+    });
+    ringLoop();
+    document.querySelectorAll('button, a, input').forEach(el => {
+      el.addEventListener('mouseenter', () => cursorEl.classList.add('cursor-hover'));
+      el.addEventListener('mouseleave', () => cursorEl.classList.remove('cursor-hover'));
+    });
+
+  //  PARTICLE CANVAS
+  const canvas = document.getElementById('particle-canvas');
+  const ctx    = canvas.getContext('2d');
+  canvas.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:1;';
+
+  function resizeCanvas() {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
+  const shapes   = ['♥','♥','✦','•','✿','❀','★','•','♥'];
+  const particles = Array.from({ length: 28 }, () => ({
+    x: Math.random() * window.innerWidth,
+    y: Math.random() * window.innerHeight,
+    tx: Math.random() * window.innerWidth,
+    ty: Math.random() * window.innerHeight,
+    size: 10 + Math.random() * 14,
+    alpha: 0.15 + Math.random() * 0.35,
+    shape: shapes[Math.floor(Math.random() * shapes.length)],
+    color: ['#f47286','#e11d48','#ffc2d0','#ff94ab','#ffb3c6'][Math.floor(Math.random()*5)],
+    speed: 0.04 + Math.random() * 0.04,
+    teleporting: false, teleportAlpha: 1,
+  }));
+
+  function teleportParticles() {
+    particles.forEach(p => {
+      p.tx = Math.random() * canvas.width;
+      p.ty = Math.random() * canvas.height;
+      p.teleporting = true; p.teleportAlpha = 0;
+      p.shape = shapes[Math.floor(Math.random() * shapes.length)];
+      p.color = ['#f47286','#e11d48','#ffc2d0','#ff94ab','#ffb3c6'][Math.floor(Math.random()*5)];
+    });
+  }
+
+  (function animParticles() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => {
+      p.x += (p.tx - p.x) * p.speed;
+      p.y += (p.ty - p.y) * p.speed;
+      if (p.teleporting) {
+        p.teleportAlpha = Math.min(p.teleportAlpha + 0.04, 1);
+        if (p.teleportAlpha >= 1) p.teleporting = false;
+      }
+      ctx.save();
+      ctx.globalAlpha  = p.alpha * p.teleportAlpha;
+      ctx.fillStyle    = p.color;
+      ctx.font         = `${p.size}px serif`;
+      ctx.textAlign    = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(p.shape, p.x, p.y);
+      ctx.restore();
+    });
+    requestAnimationFrame(animParticles);
+  })();
+
+  //  FALLING PETALS
+  const petalsContainer = document.getElementById('petals-container');
+  petalsContainer.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;';
+  const petalColors = ['#ffb3c6','#ff94ab','#ffc2d0','#ffd6e0','#ffe0e8','#f47286'];
+
+  for (let i = 0; i < 35; i++) {
+    const p     = document.createElement('div');
+    const size  = 8 + Math.random() * 14;
+    const drift = (Math.random() - 0.5) * 120;
+    p.style.cssText = `
+      position:absolute;left:${Math.random()*100}%;top:-20px;
+      width:${size}px;height:${size*0.7}px;
+      background:${petalColors[Math.floor(Math.random()*petalColors.length)]};
+      border-radius:50% 0 50% 0;
+      opacity:${0.4+Math.random()*0.4};
+      animation:petalFall ${6+Math.random()*8}s ${Math.random()*-20}s linear infinite;
+      --drift:${drift}px;--rotate:${Math.random()*360}deg;
+    `;
+    petalsContainer.appendChild(p);
+  }
+
+  const ps = document.createElement('style');
+  ps.textContent = `@keyframes petalFall {
+    0%  {transform:translateY(0) translateX(0) rotate(0deg) scale(1);}
+    100%{transform:translateY(110vh) translateX(var(--drift)) rotate(var(--rotate)) scale(0.8);opacity:0;}
+  }`;
+  document.head.appendChild(ps);
+
+  //  DARK MODE
+  const darkBtn = document.getElementById('dark-toggle');
+  if (localStorage.getItem('bday_dark') === 'true') {
+    document.body.classList.add('dark');
+    darkBtn.textContent = '☀️';
+  }
+  darkBtn.addEventListener('click', () => {
+    document.body.classList.toggle('dark');
+    const isDark = document.body.classList.contains('dark');
+    localStorage.setItem('bday_dark', isDark);
+    darkBtn.textContent = isDark ? '☀️' : '🌙';
+  });
+
+  
+
+  // Transition fill
+  new MutationObserver(() => {
+    const fill = document.getElementById('pt-fill');
+    if (fill) setTimeout(() => fill.style.width = '100%', 50);
+  }).observe(document.getElementById('page-transition'), { attributes: true, attributeFilter: ['class'] });
+
+  </script>
+</body>
+</html>

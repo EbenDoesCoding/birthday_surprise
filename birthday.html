@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Happy Birthday Christa</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎂</text></svg>">
+  <!-- Fonts: preconnect first, then load with display=swap to avoid FOIT -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=Caveat:wght@400;600;700&family=JetBrains+Mono:wght@300;400&display=swap">
+  <link rel="stylesheet" href="css/globals.css">
+  <link rel="stylesheet" href="css/birthday.css">
+  <link rel="stylesheet" href="css/visitor.css">
+</head>
+<body>
+
+  <!-- Cursor -->
+  <div id="cursor"></div>
+  <div id="cursor-ring"></div>
+
+  <!-- Progress Bar -->
+  <div id="progress-bar"></div>
+
+  <!-- Ambient BG -->
+  <div class="bg-ambient"></div>
+
+  <!-- Gallery Overlay -->
+  <div class="gallery-overlay" id="gallery-overlay"></div>
+
+  <!-- Page Transition -->
+  <div class="page-transition" id="page-transition">
+    <div class="pt-icon">✨</div>
+    <div class="pt-text">// loading memories...</div>
+    <div class="pt-bar"><div class="pt-bar-fill" id="pt-fill"></div></div>
+  </div>
+
+  <!-- Side Scroll Dots -->
+  <div class="side-scroll"></div>
+
+  <!-- NAV -->
+  <nav class="bday-nav" id="bday-nav">
+    <div class="nav-logo">✦ For Christa</div>
+    <ul class="nav-links">
+      <li><a href="#hero">Home</a></li>
+      <li><a href="#games">Games</a></li>
+      <li><a href="#answers">Answers</a></li>
+      <li><a href="#timeline">Timeline</a></li>
+      <li><a href="#gallery">Gallery</a></li>
+      <li><a href="#letter">Letter</a></li>
+      <li><a href="#wall">Wall</a></li>
+    </ul>
+    <button onclick="Session.clear('bday_user');window.location.href='index.html'" style="
+      font-family:var(--font-body);font-size:12px;color:var(--text-soft);
+      padding:7px 14px;border-radius:99px;background:transparent;
+      border:1px solid var(--rose-200);cursor:pointer;
+      transition:all 0.2s ease;margin-right:8px;"
+      onmouseover="this.style.color='var(--rose-red)';this.style.borderColor='var(--rose-pink)'"
+      onmouseout="this.style.color='var(--text-soft)';this.style.borderColor='var(--rose-200)'">
+      ← Log out
+    </button>
+    <button class="nav-music" id="music-toggle">
+      <span class="music-icon" id="music-icon">♪</span>
+      <span id="music-label">Play music</span>
+    </button>
+  </nav>
+
+  <!-- Dark mode toggle -->
+  <button class="dark-toggle" id="dark-toggle-bday" title="Toggle dark mode" style="z-index:810">🌙</button>
+
+  <!-- HERO-->
+  <section class="bday-section hero-section" id="hero">
+    <div class="hero-badge">// today.is === "the best day"</div>
+
+    <div class="hero-cake easter-egg-target" id="hero-cake">
+      <span class="cake-emoji">🎂</span>
+      <div class="cake-ring"><div class="cake-ring-dot"></div></div>
+    </div>
+
+    <h1 class="hero-title">
+      Happy Birthday,<br>
+      <span class="name-highlight">Christa</span> 🎉
+    </h1>
+
+    <p class="hero-caption">
+      Another year of being alive.<br>
+      Enjoy this year, make a lot of memories, and keep being your wonderful self! 🎈
+    </p>
+
+    <!-- Age Counter -->
+    <div class="age-counter" style="animation: heroFadeIn 1s 0.6s both">
+      <div class="age-counter-label">You have been alive for exactly</div>
+      <div id="age-counter" class="age-counter-display"></div>
+    </div>
+
+    <a href="#timeline" class="btn-primary" style="animation: heroFadeIn 1s 0.75s both">
+      <span>✦</span> Explore Your Day <span>↓</span>
+    </a>
+  </section>
+
+  <section class="bday-section" id="games" style="min-height:auto;padding:80px 24px">
+    <div class="block-accent">✦ games.unlockForBirthdayGirl()</div>
+    <h2 class="section-heading">🎮 Play the Games</h2>
+    <p class="section-sub">See what your friends had to answer about you 👀</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;max-width:860px;width:100%" id="bday-games-grid"></div>
+  </section>
+
+  <section class="bday-section" id="answers" style="min-height:auto;padding:80px 24px">
+    <div class="block-accent">✦ answers.reveal()</div>
+    <h2 class="section-heading">👀 What People Said About You</h2>
+    <p class="section-sub">See how your friends answered the quiz questions</p>
+
+    <div style="max-width:720px;width:100%">
+      <div class="answers-tabs" id="answers-tabs"></div>
+      <div class="answers-display" id="answers-display"></div>
+    </div>
+  </section>
+
+  <!--  2. TIMELINE -->
+  <section class="bday-section timeline-section" id="timeline" style="padding:100px 40px 80px">
+    <div class="block-accent reveal">✦ timeline.render()</div>
+    <h2 class="section-heading reveal reveal-delay-1">📍 Moments That Made You</h2>
+    <p class="section-sub reveal reveal-delay-2">A few chapters in the story of you</p>
+
+    <div class="timeline-container" id="timeline-items" style="position:relative">
+      <div class="timeline-line"></div>
+      <!-- Items injected by JS -->
+    </div>
+  </section>
+
+  <!-- 3. VIDEOS -->
+  <section class="bday-section video-section" id="videos">
+    <div class="block-accent reveal">✦ goofyMoments.play()</div>
+    <h2 class="section-heading reveal reveal-delay-1">🎬 Goofy Moments</h2>
+    <p class="section-sub reveal reveal-delay-2">The ones that make us laugh and embarrass you</p>
+
+    <div class="video-track-wrapper reveal reveal-delay-3" style="max-width:100%;overflow:hidden">
+      <div class="video-track" id="video-track"></div>
+    </div>
+
+    <div class="carousel-controls reveal reveal-delay-4">
+      <button class="carousel-btn" onclick="carouselPrev()">‹</button>
+      <div class="carousel-dots" id="carousel-dots"></div>
+      <button class="carousel-btn" onclick="carouselNext()">›</button>
+    </div>
+  </section>
+
+  <!-- 4. PHOTO GALLERY -->
+  <section class="gallery-section bday-section" id="gallery">
+    <div class="block-accent reveal">✦ photos.scatter()</div>
+    <h2 class="section-heading reveal reveal-delay-1">📷 Memories</h2>
+    <p class="section-sub reveal reveal-delay-2">Scattered moments, forever treasured</p>
+
+    <div class="gallery-grid reveal reveal-delay-3" id="gallery-grid">
+      <!-- Injected by JS -->
+    </div>
+    <p style="margin-top:24px;font-size:12px;color:var(--text-soft);font-family:var(--font-mono);opacity:0.6">
+      // click a photo to focus it (it's semi broken) ✦
+    </p>
+  </section>
+
+  <!-- 5. LETTER -->
+  <section class="letter-section bday-section" id="letter" style="background:linear-gradient(180deg,transparent,rgba(255,182,200,0.07),transparent)">
+    <div class="block-accent reveal">✦ letter.unroll()</div>
+    <h2 class="section-heading reveal reveal-delay-1">💌 A Note For You</h2>
+    <p class="section-sub reveal reveal-delay-2">Open when you need a reminder of how valued you are</p>
+
+    <div class="scroll-container reveal reveal-delay-3">
+      <div class="scroll-top"></div>
+      <div class="scroll-paper" id="scroll-paper">
+        <div class="letter-greeting">Dear Christa,</div>
+        <div class="letter-body" id="letter-body"></div>
+        <div class="letter-sign" id="letter-sign"></div>
+      </div>
+      <div class="scroll-bottom"></div>
+    </div>
+  </section>
+
+  <!-- 7. GAMES FOR HER -->
+
+
+  <!-- 6. STICKY WALL -->
+  <section class="wall-section bday-section" id="wall">
+    <div class="block-accent reveal">✦ messages.forEach(wish => wall.post(wish))</div>
+    <h2 class="section-heading reveal reveal-delay-1">💌 Messages For You</h2>
+    <p class="section-sub reveal reveal-delay-2">Special notes from people who love you</p>
+
+    <!-- Add note form -->
+    <div class="wall-input-area glass reveal reveal-delay-3" style="padding:24px;margin-bottom:40px">
+      <input type="text" id="wall-name" class="input-field" placeholder="Your name" style="margin-bottom:10px">
+      <textarea id="wall-text" placeholder="Write your birthday wish..." class="input-field" style="height:88px;resize:none;border-radius:12px;line-height:1.6"></textarea>
+      <button class="btn-primary" onclick="document.getElementById('wall-form').dispatchEvent(new Event('submit'))">
+        <span>✈</span> Post Wish
+      </button>
+      <form id="wall-form" style="display:none"></form>
+    </div>
+
+    <div class="wall-grid" id="wall-grid"></div>
+
+    <!-- Footer -->
+    <footer style="margin-top:80px;text-align:center;padding-bottom:60px">
+      <div style="font-family:var(--font-hand);font-size:22px;color:var(--rose-pink);margin-bottom:8px">
+        Made just for you 🌹
+      </div>
+      <div style="font-family:var(--font-mono);font-size:12px;color:var(--text-soft);opacity:0.6">
+        // console.log("Happy Birthday, Christa!")
+      </div>
+      <div style="margin-top:20px;font-size:28px" class="easter-egg-target">🎁</div>
+    </footer>
+  </section>
+
+  <!-- Game Modal (for her games section) -->
+  <div class="game-modal-overlay" id="bday-game-overlay">
+    <div class="game-modal" id="bday-game-modal"></div>
+  </div>
+
+  <script src="js/storage.js"></script>
+  <script src="js/birthday.js"></script>
+  <script>
+    // Wire wall form
+    document.getElementById('wall-form')?.addEventListener('submit', e => {
+      e.preventDefault();
+      const user = Session.get('bday_user');
+      const name = document.getElementById('wall-name').value.trim() || user?.name || 'Anonymous';
+      const text = document.getElementById('wall-text').value.trim();
+      if (!text) return;
+      Notes.add(name, text);
+      renderNotes();
+      document.getElementById('wall-text').value = '';
+      document.getElementById('wall-name').value = '';
+    });
+
+    // Transition fill
+    const pt = document.getElementById('page-transition');
+    if (pt) {
+      new MutationObserver(() => {
+        const fill = document.getElementById('pt-fill');
+        if (fill) setTimeout(() => fill.style.width = '100%', 50);
+      }).observe(pt, { attributes: true, attributeFilter: ['class'] });
+    }
+  </script>
+</body>
+</html>

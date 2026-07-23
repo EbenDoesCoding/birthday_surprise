@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Christa's Birthday Party 🎉</title>
+   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎉</text></svg>">
+  <!-- Fonts: preconnect first, then load with display=swap to avoid FOIT -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=Caveat:wght@400;600;700&family=JetBrains+Mono:wght@300;400&display=swap">
+  <link rel="stylesheet" href="css/globals.css">
+  <link rel="stylesheet" href="css/visitor.css">
+</head>
+<body>
+
+  <!-- Cursor -->
+  <div id="cursor"></div>
+  <div id="cursor-ring"></div>
+
+  <!-- Progress Bar -->
+  <div id="progress-bar"></div>
+
+  <!-- Ambient BG -->
+  <div class="bg-ambient"></div>
+
+  <!-- Page Transition -->
+  <div class="page-transition" id="page-transition">
+    <div class="pt-icon">🎉</div>
+    <div class="pt-text">// loading the party...</div>
+    <div class="pt-bar"><div class="pt-bar-fill" id="pt-fill"></div></div>
+  </div>
+
+  <!-- Side Dots -->
+  <div class="side-scroll"></div>
+
+  <nav class="visitor-nav" id="visitor-nav">
+    <div class="nav-logo">✦ Christa's Birthday</div>
+    <div class="nav-visitor-tag">// visitor mode</div>
+    <div class="nav-right">
+      <span class="nav-user" id="nav-user"></span>
+      <button onclick="Session.clear('bday_user');window.location.href='index.html'" style="
+        font-family:var(--font-body);font-size:12px;color:var(--text-soft);
+        padding:7px 14px;border-radius:99px;background:transparent;
+        border:1px solid var(--rose-200);cursor:pointer;
+        transition:all 0.2s ease;"
+        onmouseover="this.style.color='var(--rose-red)';this.style.borderColor='var(--rose-pink)'"
+        onmouseout="this.style.color='var(--text-soft)';this.style.borderColor='var(--rose-200)'">
+        ← Log out
+      </button>
+    </div>
+  </nav>
+
+  <!-- Dark mode toggle -->
+  <button class="dark-toggle" id="dark-toggle-visitor" title="Toggle dark mode" style="z-index:810">🌙</button>
+
+  <!--  HERO-->
+  <section class="visitor-hero visitor-section" id="visitor-hero">
+    <div class="visitor-hero-sub reveal">// you've been invited</div>
+    <h1 class="visitor-hero-title reveal reveal-delay-1">
+      It's <span class="visitor-hero-name">Christa's</span><br>Birthday! 🎂
+    </h1>
+    <p class="visitor-hero-caption reveal reveal-delay-2">
+      Play games, climb the leaderboard, and leave her a birthday wish 💕
+    </p>
+    <div style="margin-top:32px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap" class="reveal reveal-delay-3">
+      <a href="#games" class="btn-primary">
+        <span>🎮</span> Play Games
+      </a>
+      <a href="#public-wall" class="btn-primary" style="background:white;color:var(--rose-red);border:1.5px solid var(--rose-200);box-shadow:var(--shadow-card)">
+        <span>💌</span> Leave a Wish
+      </a>
+    </div>
+
+    <!-- Floating emoji burst -->
+    <div style="position:absolute;inset:0;pointer-events:none;overflow:hidden" aria-hidden="true" id="hero-floats"></div>
+  </section>
+
+  <!--  LEADERBOARD -->
+  <section class="leaderboard-section visitor-section" id="leaderboard">
+    <div class="block-accent reveal">✦ leaderboard.render()</div>
+    <h2 class="section-heading reveal reveal-delay-1">🏆 Leaderboard</h2>
+    <p class="section-sub reveal reveal-delay-2">Who knows the birthday girl best?</p>
+
+    <div class="lb-card reveal reveal-delay-3">
+      <div class="lb-header">
+        <div class="lb-title">Top Players</div>
+        <div class="lb-live">
+          <div class="lb-live-dot"></div>
+          LIVE
+        </div>
+      </div>
+      <div class="lb-cols">
+        <div>#</div>
+        <div>Player</div>
+        <div style="text-align:center">Games</div>
+        <div style="text-align:right">Score</div>
+      </div>
+      <div id="lb-body">
+        <!-- Injected by JS -->
+        <div style="padding:40px;text-align:center;color:var(--text-soft);font-size:14px">
+          <div style="font-size:28px;margin-bottom:8px">⏳</div>
+          Loading leaderboard…
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GAMES -->
+  <section class="games-section visitor-section" id="games">
+    <div class="block-accent reveal">✦ games.forEach(g => g.play())</div>
+    <h2 class="section-heading reveal reveal-delay-1">🎮 Mini Games</h2>
+    <p class="section-sub reveal reveal-delay-2">Play games, earn points, and climb the leaderboard!</p>
+
+    <div class="games-grid" id="games-grid">
+      <!-- Injected by JS -->
+    </div>
+  </section>
+
+  <!--  PUBLIC STICKY WALL -->
+  <section class="public-wall-section visitor-section" id="public-wall">
+    <div class="block-accent reveal">✦ wishes.post()</div>
+    <h2 class="section-heading reveal reveal-delay-1">💌 Birthday Wishes</h2>
+    <p class="section-sub reveal reveal-delay-2">Leave Christa a note — she'll see every single one 🌸</p>
+
+    <!-- Form -->
+    <div class="glass wall-form reveal reveal-delay-3" style="padding:24px 26px;border-radius:20px">
+      <div style="display:flex;gap:10px;margin-bottom:10px">
+        <input
+          type="text"
+          id="public-name"
+          class="input-field"
+          placeholder="Your name"
+          style="flex:1"
+          maxlength="40"
+        >
+      </div>
+      <textarea
+        id="public-text"
+        class="input-field"
+        placeholder="Write your birthday wish for Christa… ✨"
+        style="width:100%;height:88px;resize:none;line-height:1.6;margin-bottom:10px"
+        maxlength="280"
+      ></textarea>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+        <span id="char-count" style="font-size:12px;color:var(--text-soft);font-family:var(--font-mono)">0 / 280</span>
+        <button class="btn-primary" id="post-wish-btn" style="padding:12px 28px;font-size:14px">
+          <span>✈</span> Post Wish
+        </button>
+      </div>
+      <div id="wall-msg" style="font-size:13px;color:var(--rose-red);margin-top:8px;min-height:18px"></div>
+    </div>
+
+    <!-- Notes Grid -->
+    <div class="wall-notes-grid" id="public-notes-grid">
+      <!-- Injected + realtime -->
+    </div>
+
+    <!-- Footer -->
+    <footer style="margin-top:80px;text-align:center;padding-bottom:60px;width:100%">
+      <div style="font-family:var(--font-hand);font-size:22px;color:var(--rose-pink);margin-bottom:8px">
+        Made just for Christa
+      </div>
+      <div style="font-family:var(--font-mono);font-size:12px;color:var(--text-soft);opacity:0.5">
+        // console.log("Happy Birthday, Christa!")
+      </div>
+      <div style="margin-top:20px;font-size:28px;cursor:pointer" class="easter-egg-target">🎁</div>
+    </footer>
+  </section>
+
+  <!--  GAME MODAL-->
+  <div class="game-modal-overlay" id="game-modal-overlay">
+    <div class="game-modal" id="game-modal"></div>
+  </div>
+
+  <script src="js/storage.js"></script>
+  <script src="js/visitor.js"></script>
+  <script>
+    // Char counter
+    const txt = document.getElementById('public-text');
+    const cnt = document.getElementById('char-count');
+    txt?.addEventListener('input', () => {
+      cnt.textContent = `${txt.value.length} / 280`;
+      cnt.style.color = txt.value.length > 250 ? 'var(--rose-red)' : 'var(--text-soft)';
+    });
+
+    // Hero floats
+    const floatContainer = document.getElementById('hero-floats');
+    const floatSymbols = ['🎂','🎉','✨','💕','🌸','🎈','⭐','💫'];
+    for (let i = 0; i < 12; i++) {
+      const el = document.createElement('span');
+      el.style.cssText = `
+        position:absolute;
+        left:${Math.random()*100}%;
+        font-size:${18+Math.random()*20}px;
+        animation:particleFloat ${8+Math.random()*10}s ease-in infinite;
+        animation-delay:${Math.random()*-15}s;
+        opacity:0;
+        --x:${(Math.random()-0.5)*60}px;
+        --dur:${8+Math.random()*10}s;
+      `;
+      el.textContent = floatSymbols[i % floatSymbols.length];
+      floatContainer?.appendChild(el);
+    }
+
+    // Transition fill observer
+    new MutationObserver(() => {
+      const fill = document.getElementById('pt-fill');
+      if (fill) setTimeout(() => fill.style.width = '100%', 50);
+    }).observe(document.getElementById('page-transition'), { attributes: true, attributeFilter: ['class'] });
+  </script>
+</body>
+</html>
